@@ -10,7 +10,7 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 # following steps from OpenAI quickstart
 # load the document
 file = client.files.create(
-    file=open(r"C:\workspace\Projects\Document_Summariser\frank-a5.pdf", "rb"),
+    file=open(r".\test_documents\frank-a5.pdf", "rb"),
     purpose="user_data",
     expires_after={
         "anchor": "created_at",
