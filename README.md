@@ -27,4 +27,4 @@ The above are the capabilities and performance i can think of at the start, i'll
 - Deploy the tool
     - Deploy the tool and add in user features to allow for personalisation with the tool.
 
-The suggested plan is not concentre and could change or be adapated as needed.
+The suggested plan is not concentre and could change or be adapted as needed.
