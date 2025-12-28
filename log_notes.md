@@ -12,3 +12,11 @@ The PDF files are provided as either Base64-encoded data or as file IDs obtained
 while looking through how i can upload other types of document to the LLM model and get a summary of it, i've found a [platform](https://community.openai.com/t/chatpdf-com-chat-with-any-pdf-using-the-new-chatgpt-api/81446) that offers the capabilities i'm interested in.
 
 Additional notes
+Notes made on different API style offered by OpenAI (Response & Assistant). As a very quick summary, the response API is stateless, every request made is independent from each other and there's no concept of memory retained between requests. The assistant API is stateful, requests made follow on from the previous request.
+
+28/12/2025
+- Added class (OpenAIBackend & LLMModelBackend) to wrap around LLM model. Defined in hopes of allowing defined class to be model agnostic.
+- Defined LLMDocumentSummariser class wrap around model class.
+- Refactored OpenAIBackend to handle different file types.
+
+- Began further experiments to test limit of document summarisation.
