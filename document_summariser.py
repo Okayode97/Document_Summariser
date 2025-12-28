@@ -1,8 +1,10 @@
 import argparse
+from ast import Tuple
 import os
 from openai import OpenAI
 from pathlib import Path
 from abc import ABC, abstractmethod
+from typing import Dict
 
 PROMPT = "Can you provide a clear and concise summary on the contents of the uploaded file."
 SUPPORTED_FILE_TYPES = [".pdf", ".txt", ".word", ".py", ".md"]
@@ -23,27 +25,18 @@ class OpenAISummariser(LLMModelBackend):
     
     def summarise_document(self, document_path: Path, prompt: str):        
         if document_path.suffix == ".pdf":
-            self.handle_pdf_document(document_path, prompt)
+            extracted_contents_dict = self.handle_pdf_document(document_path, prompt)
         
         if document_path.suffix in [".txt", ".py", ".md"]:
-            self.handle_text_document(document_path, prompt)
-
-    def handle_pdf_document(self, document_path: Path, prompt: str):
-
-        # upload the pdf file to openai
-        file = self.client.files.create(file=open(str(document_path), "rb"), purpose="user_data",
-            expires_after={"anchor": "created_at", "seconds": 2592000}) # deletes the file after 30 days
-
+            extracted_contents_dict = self.handle_text_document(document_path, prompt)
+    
         # get chat to summarise the contents of the model
         response = self.client.responses.create(model=self.model,
             input=[
                 {
                     "role": "user",
                     "content": [
-                        {
-                            "type": "input_file",
-                            "file_id": file.id,
-                        },
+                        extracted_contents_dict,
                         {
                             "type": "input_text",
                             "text": f"File type: {document_path.suffix}"
@@ -58,39 +51,23 @@ class OpenAISummariser(LLMModelBackend):
         )
         print(f"Generated Response: {response.output_text}")
 
-        # delete the file after it's been uploaded and summarised
-        self.client.files.delete(file.id)
+        if document_path.suffix == ".pdf":
+            assert "file_id" in extracted_contents_dict
+            self.client.files.delete(extracted_contents_dict["file_id"])
 
-    def handle_text_document(self, document_path: Path, prompt: str):
+    def handle_pdf_document(self, document_path: Path, prompt: str) -> Dict:
+        # upload the pdf file to openai
+        file = self.client.files.create(file=open(str(document_path), "rb"), purpose="user_data",
+            expires_after={"anchor": "created_at", "seconds": 2592000}) # deletes the file after 30 days
 
+        return {"type": "input_file", "file_id": file.id}
+
+    def handle_text_document(self, document_path: Path, prompt: str) -> Dict:
         # open the file and read it's contents
         with open(document_path, "r", encoding="utf-8") as f:
             extracted_text = f.read()
 
-        # get chat to summarise the contents of the model
-        response = self.client.responses.create(model=self.model,
-            input=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "input_file",
-                            "file_id": f"Document contents.\n\n{extracted_text}",
-                        },
-                        {
-                            "type": "input_text",
-                            "text": f"File type: {document_path.suffix}"
-                        },
-                        {
-                            "type": "input_text",
-                            "text": prompt
-                        }
-                    ]
-                }
-            ]
-        )
-
-        print(response.output_text)
+        return {"type": "input_text", "text": f"Document contents.\n\n{extracted_text}"}
 
 
 class LLMDocumentSummariser:
