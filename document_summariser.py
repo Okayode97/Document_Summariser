@@ -1,20 +1,22 @@
 import argparse
-from ast import Tuple
 import os
 from openai import OpenAI
 from pathlib import Path
 from abc import ABC, abstractmethod
 from typing import Dict
 
+
 PROMPT = "Can you provide a clear and concise summary on the contents of the uploaded file."
 SUPPORTED_FILE_TYPES = [".pdf", ".txt", ".word", ".py", ".md"]
+
 
 class LLMModelBackend(ABC):
     @abstractmethod
     def summarise_document(self, path: Path, prompt: str):
         pass
 
-class OpenAISummariser(LLMModelBackend):
+
+class OpenAIBackend(LLMModelBackend):
     
     def __init__(self):
         OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -73,7 +75,7 @@ class OpenAISummariser(LLMModelBackend):
 class LLMDocumentSummariser:
 
     def __init__(self):
-        self.model_summariser = OpenAISummariser()
+        self.model_summariser = OpenAIBackend()
         self.prompt = PROMPT
 
     def summarise_document(self, document_path: Path):
