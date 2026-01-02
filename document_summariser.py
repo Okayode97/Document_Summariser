@@ -7,7 +7,7 @@ from typing import Dict
 
 
 PROMPT = "Can you provide a clear and concise summary on the contents of the uploaded file."
-SUPPORTED_FILE_TYPES = [".pdf", ".txt", ".word", ".py", ".md"]
+SUPPORTED_FILE_TYPES = [".pdf", ".txt", ".py", ".md"]
 
 
 class LLMModelBackend(ABC):
