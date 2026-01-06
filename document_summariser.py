@@ -6,7 +6,11 @@ from abc import ABC, abstractmethod
 from typing import Dict
 
 
-PROMPT = "Can you provide a clear and concise summary on the contents of the uploaded file."
+PROMPT = """
+Can you read through the uploaded document and respond with a concise and clear summary of the document, with the expectation that more questions would be asked about the contents of the document.
+In your response as well can you answer the questions listed below.
+- What is the first line in page 129
+"""
 SUPPORTED_FILE_TYPES = [".pdf", ".txt", ".py", ".md"]
 
 
